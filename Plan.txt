@@ -1,0 +1,359 @@
+📘 PROJECT DOCUMENT
+Concept Extraction Engine – End-to-End Deployment Guide
+0️⃣ PROJECT VISION
+
+Build a web application that:
+
+Accepts any code snippet
+
+Detects language + domain
+
+Extracts core technical concepts
+
+Returns structured explanation (JSON → formatted UI)
+
+Is fully deployed and usable online
+
+This is Version 1 (Non-agentic).
+
+1️⃣ SYSTEM ARCHITECTURE (FINAL VERSION)
+
+User → Frontend (Web UI) → Backend (FastAPI) → LLM API → Structured JSON → UI Rendering
+
+2️⃣ PHASE 1 – FOUNDATION SETUP
+Step 1: Create Project Folder Structure
+concept-extractor/
+│
+├── backend/
+│   ├── main.py
+│   ├── requirements.txt
+│   └── .env
+│
+├── frontend/
+│   ├── index.html
+│   ├── style.css
+│   └── script.js
+│
+└── README.md
+
+
+Do NOT overcomplicate this.
+
+Step 2: Backend Setup (FastAPI)
+Install:
+
+Python 3.10+
+
+pip
+
+virtualenv
+
+Inside /backend:
+
+python -m venv venv
+source venv/bin/activate  (or venv\Scripts\activate on Windows)
+pip install fastapi uvicorn python-dotenv openai
+
+
+Create requirements.txt:
+
+fastapi
+uvicorn
+python-dotenv
+openai
+
+Step 3: Basic FastAPI Server
+
+Create main.py:
+
+Import FastAPI
+
+Create app instance
+
+Create POST endpoint /analyze
+
+Accept JSON input:
+{
+"code": "..."
+}
+
+Return dummy JSON first
+
+Test locally:
+
+uvicorn main:app --reload
+
+
+Visit:
+http://127.0.0.1:8000/docs
+
+Make sure endpoint works before moving ahead.
+
+3️⃣ PHASE 2 – LLM INTEGRATION
+Step 4: Add OpenAI or Claude API
+
+Add .env file:
+
+OPENAI_API_KEY=your_key_here
+
+
+Load using python-dotenv.
+
+Step 5: Structured Prompt Design
+
+Your prompt MUST request strict JSON format.
+
+Example structure:
+
+Analyze the following code.
+
+Return JSON with:
+{
+  "language": "",
+  "domain": "",
+  "primary_concepts": [],
+  "secondary_concepts": [],
+  "design_patterns": [],
+  "architectural_layer": "",
+  "time_complexity": "",
+  "space_complexity": "",
+  "execution_flow": "",
+  "why_abstraction_exists": "",
+  "prerequisite_concepts": []
+}
+
+Code:
+<insert code>
+
+
+VERY IMPORTANT:
+
+Force JSON output
+
+Validate response before returning
+
+Step 6: Connect LLM to Endpoint
+
+Inside /analyze:
+
+Receive code
+
+Send to LLM
+
+Parse response
+
+Return structured JSON
+
+Test with:
+
+DSA code
+
+Backend code
+
+ML snippet
+
+Only move forward when backend is stable.
+
+4️⃣ PHASE 3 – FRONTEND
+Step 7: Basic UI (No Framework Yet)
+
+index.html:
+
+Textarea
+
+Button ("Analyze Concepts")
+
+Result display section
+
+script.js:
+
+On button click
+
+Send POST request to backend
+
+Receive JSON
+
+Render structured sections
+
+Use fetch API.
+
+Do not add React yet.
+
+Step 8: Clean Rendering Format
+
+Display sections like:
+
+Language
+Domain
+Primary Concepts
+Execution Flow
+Why Abstraction Exists
+
+Make it readable and structured.
+
+Do NOT beautify too much yet.
+
+5️⃣ PHASE 4 – DEPLOYMENT
+
+We deploy backend and frontend separately.
+
+Step 9: Prepare Backend for Production
+
+Remove debug mode
+
+Add CORS middleware
+
+Use environment variables properly
+
+Add:
+
+from fastapi.middleware.cors import CORSMiddleware
+
+
+Allow frontend domain.
+
+Step 10: Deploy Backend
+
+Use one of:
+
+Render
+
+Railway
+
+Fly.io
+
+For beginner simplicity → Use Render.
+
+Steps:
+
+Push backend folder to GitHub
+
+Create new Web Service on Render
+
+Connect repo
+
+Add environment variable (OPENAI_API_KEY)
+
+Start command:
+
+uvicorn main:app --host 0.0.0.0 --port 10000
+
+
+Wait until live URL is generated.
+
+Test endpoint publicly.
+
+Step 11: Deploy Frontend
+
+Options:
+
+Vercel
+
+Netlify
+
+Simplest → Vercel
+
+Steps:
+
+Push frontend folder separately
+
+Update API URL in script.js
+
+Deploy via Vercel
+
+Make sure:
+Frontend can call backend.
+
+6️⃣ PHASE 5 – TESTING
+
+Test with:
+
+Binary search
+
+Express route
+
+React component
+
+Linear regression snippet
+
+Multithreading example
+
+Check:
+
+JSON consistency
+
+No hallucinated fields
+
+Stable format
+
+7️⃣ PHASE 6 – IMPROVEMENTS (ONLY AFTER DEPLOYMENT)
+
+Do NOT start these early.
+
+After working deployment:
+
+Add syntax highlighting
+
+Add loading spinner
+
+Add copy-to-clipboard
+
+Add error handling
+
+Add rate limiting
+
+Add token usage control
+
+8️⃣ OPTIONAL PHASE 7 – EXTENSION VERSION
+
+After web app works:
+
+Option A:
+
+Chrome Extension that injects explanation below ChatGPT code blocks
+
+Option B:
+
+VS Code extension
+
+Only after web version succeeds.
+
+9️⃣ TECH CONCEPTS YOU WILL LEARN THROUGH THIS
+
+By completing this, you will understand:
+
+What is backend
+
+What is API
+
+What is REST
+
+What is JSON
+
+What is HTTP lifecycle
+
+What is CORS
+
+What is environment variable
+
+What is deployment
+
+What is cloud hosting
+
+What is client-server architecture
+
+What is structured prompt engineering
+
+This fixes your earlier gap.
+
+🔟 RULES YOU MUST FOLLOW
+
+Do not add new features mid-build.
+
+Do not redesign architecture halfway.
+
+Do not jump to extensions early.
+
+Deploy early.
+
+Keep version 1 small and stable.
