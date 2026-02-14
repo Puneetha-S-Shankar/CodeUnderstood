@@ -72,20 +72,21 @@ Code:
             contents=prompt
         )
 
-        
-
-        print("RAW GEMINI RESPONSE:")
-        print(response)
-
         text = response.text
-        print("TEXT OUTPUT:")
-        print(text)
+
+        logging.info("=== GEMINI RAW TEXT ===")
+        logging.info(text)
+        logging.info("=======================")
 
         return {
             "raw": text
         }
+
     except Exception as e:
+        logging.error("GEMINI ERROR:")
+        logging.error(str(e))
+
         return {
-            "error": "Gemini API error",
-            "details": str(e)
+            "error": str(e)
         }
+    
