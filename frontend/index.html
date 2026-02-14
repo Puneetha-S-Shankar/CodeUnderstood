@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Code Understood</title>
+
+<link rel="stylesheet" href="style.css">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+
+</head>
+
+<body>
+
+<div class="container">
+
+  <header>
+    <h1>Code <span>Understood</span></h1>
+    <p>AI-powered architectural decomposition</p>
+  </header>
+
+  <section class="input-section">
+    <textarea id="codeInput" placeholder="Paste your code here..."></textarea>
+    <button id="analyzeBtn">Analyze Concepts</button>
+  </section>
+
+  <div id="loading" class="hidden">Analyzing...</div>
+
+  <div id="errorBox" class="hidden"></div>
+
+  <div id="results"></div>
+
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
