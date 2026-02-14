@@ -57,11 +57,11 @@ try:
     # Initialize Vertex AI
     vertexai.init(
         project=creds_dict["project_id"],
-        location="us-central1"
+        location="global"
     )
 
     # Load Gemini model
-    model = GenerativeModel("gemini-2.0-flash-001")
+    model = GenerativeModel("gemini-1.5-flash")
 
     logging.info("Vertex AI Gemini initialized successfully")
 
