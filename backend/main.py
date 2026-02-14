@@ -61,7 +61,7 @@ try:
     )
 
     # Load Gemini model
-    model = GenerativeModel("gemini-1.5-flash-002")
+    model = GenerativeModel("gemini-2.0-flash-001")
 
     logging.info("Vertex AI Gemini initialized successfully")
 
