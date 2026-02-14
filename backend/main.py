@@ -1,42 +1,94 @@
-from fastapi.middleware.cors import CORSMiddleware
-import logging
-from fastapi import FastAPI
-from pydantic import BaseModel
-from dotenv import load_dotenv
 import os
 import json
-from google import genai
+import logging
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
 
+import vertexai
+from vertexai.generative_models import GenerativeModel
 
-load_dotenv()
+# =============================
+# Logging setup
+# =============================
+
+logging.basicConfig(level=logging.INFO)
+
+# =============================
+# FastAPI app
+# =============================
 
 app = FastAPI()
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://127.0.0.1:5500"],
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
-logging.basicConfig(level=logging.INFO)
 
-# Configure Gemini client
-client = genai.Client(
-    api_key=os.environ["GEMINI_API_KEY"]
-)
-
+# =============================
+# Request model
+# =============================
 
 class CodeRequest(BaseModel):
     code: str
 
+# =============================
+# Load Google credentials from Render env
+# =============================
+
+try:
+    creds_json = os.environ.get("GOOGLE_APPLICATION_CREDENTIALS_JSON")
+
+    if not creds_json:
+        raise Exception("Missing GOOGLE_APPLICATION_CREDENTIALS_JSON")
+
+    creds_dict = json.loads(creds_json)
+
+    creds_path = "/tmp/gcp-creds.json"
+
+    with open(creds_path, "w") as f:
+        json.dump(creds_dict, f)
+
+    os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = creds_path
+
+    # Initialize Vertex AI
+    vertexai.init(
+        project=creds_dict["project_id"],
+        location="us-central1"
+    )
+
+    # Load Gemini model
+    model = GenerativeModel("gemini-1.5-flash")
+
+    logging.info("Vertex AI Gemini initialized successfully")
+
+except Exception as e:
+    logging.error("Failed to initialize Vertex AI")
+    logging.error(str(e))
+    model = None
+
+# =============================
+# Health check route
+# =============================
 
 @app.get("/")
-def read_root():
-    return {"message": "Concept Extractor Backend (Gemini) is running 🚀"}
+def root():
+    return {"status": "CodeUnderstood backend running"}
 
+# =============================
+# Analyze endpoint
+# =============================
 
 @app.post("/analyze")
 def analyze_code(request: CodeRequest):
+
+    if not model:
+        return {
+            "error": "Gemini model not initialized"
+        }
 
     prompt = f"""
 You are a computer science concept extraction engine.
@@ -64,32 +116,32 @@ Return JSON with EXACT structure:
   "prerequisite_concepts": []
 }}
 
-
 Code:
 {request.code}
 """
 
     try:
-        response = client.models.generate_content(
-            model="gemini-1.5-flash",
-            contents=prompt
-        )
 
-        text = response.text
+        response = model.generate_content(prompt)
 
-        logging.info("=== GEMINI RAW TEXT ===")
-        logging.info(text)
-        logging.info("=======================")
+        text = response.text.strip()
 
-        return {
-            "raw": text
-        }
+        logging.info("Gemini response received")
+
+        # Try parsing JSON
+        try:
+            parsed = json.loads(text)
+            return parsed
+        except:
+            return {
+                "raw": text
+            }
 
     except Exception as e:
-        logging.error("GEMINI ERROR:")
+
+        logging.error("Gemini error")
         logging.error(str(e))
 
         return {
             "error": str(e)
         }
-    
