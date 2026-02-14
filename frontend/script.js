@@ -5,6 +5,7 @@ const loading = document.getElementById("loading");
 const errorBox = document.getElementById("errorBox");
 
 analyzeBtn.addEventListener("click", async () => {
+
   const code = textarea.value.trim();
 
   if (!code) {
@@ -15,18 +16,29 @@ analyzeBtn.addEventListener("click", async () => {
   resultsDiv.innerHTML = "";
   errorBox.classList.add("hidden");
   loading.classList.remove("hidden");
+  analyzeBtn.disabled = true;
 
   try {
-    const response = await fetch("http://127.0.0.1:8000/analyze", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({ code })
-    });
+
+    const response = await fetch(
+      "https://codeunderstood.onrender.com/analyze",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ code })
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error("Backend error: " + response.status);
+    }
 
     const data = await response.json();
+
     loading.classList.add("hidden");
+    analyzeBtn.disabled = false;
 
     if (data.error) {
       showError(data.error);
@@ -36,10 +48,15 @@ analyzeBtn.addEventListener("click", async () => {
     renderResults(data);
 
   } catch (err) {
+
     loading.classList.add("hidden");
+    analyzeBtn.disabled = false;
+
     showError("Failed to connect to backend.");
     console.error(err);
+
   }
+
 });
 
 function showError(message) {
@@ -57,17 +74,21 @@ function createCard(title, content) {
 }
 
 function renderResults(data) {
+
+  const safeJoin = (value) =>
+    Array.isArray(value) ? value.join(", ") : value || "N/A";
+
   resultsDiv.innerHTML = `
-    ${createCard("Language", data.language)}
-    ${createCard("Domain", data.domain)}
-    ${createCard("Architectural Layer", data.architectural_layer)}
-    ${createCard("Time Complexity", data.time_complexity)}
-    ${createCard("Space Complexity", data.space_complexity)}
-    ${createCard("Primary Concepts", data.primary_concepts.join(", "))}
-    ${createCard("Secondary Concepts", data.secondary_concepts.join(", "))}
-    ${createCard("Design Patterns", data.design_patterns.join(", "))}
-    ${createCard("Execution Flow", data.execution_flow)}
-    ${createCard("Why Abstraction Exists", data.why_abstraction_exists)}
-    ${createCard("Prerequisites", data.prerequisite_concepts.join(", "))}
+    ${createCard("Language", data.language || "N/A")}
+    ${createCard("Domain", data.domain || "N/A")}
+    ${createCard("Architectural Layer", data.architectural_layer || "N/A")}
+    ${createCard("Time Complexity", data.time_complexity || "N/A")}
+    ${createCard("Space Complexity", data.space_complexity || "N/A")}
+    ${createCard("Primary Concepts", safeJoin(data.primary_concepts))}
+    ${createCard("Secondary Concepts", safeJoin(data.secondary_concepts))}
+    ${createCard("Design Patterns", safeJoin(data.design_patterns))}
+    ${createCard("Execution Flow", data.execution_flow || "N/A")}
+    ${createCard("Why Abstraction Exists", data.why_abstraction_exists || "N/A")}
+    ${createCard("Prerequisites", safeJoin(data.prerequisite_concepts))}
   `;
 }

@@ -128,14 +128,21 @@ Code:
 
         logging.info("Gemini response received")
 
-        # Try parsing JSON
+        # Remove ```json wrapping if present
+        if text.startswith("```"):
+            parts = text.split("```")
+            if len(parts) >= 2:
+                text = parts[1]
+                if text.startswith("json"):
+                    text = text[4:]
+                text = text.strip()
+
+        # Parse JSON safely
         try:
             parsed = json.loads(text)
             return parsed
-        except:
-            return {
-                "raw": text
-            }
+        except Exception:
+            return {"raw": text}
 
     except Exception as e:
 
