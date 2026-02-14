@@ -1,11 +1,12 @@
 from fastapi.middleware.cors import CORSMiddleware
-
+import logging
 from fastapi import FastAPI
 from pydantic import BaseModel
 from dotenv import load_dotenv
 import os
 import json
 from google import genai
+
 
 load_dotenv()
 
@@ -17,10 +18,13 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
+logging.basicConfig(level=logging.INFO)
 
 # Configure Gemini client
-client = genai.Client(api_key=os.environ["GEMINI_API_KEY"])
+client = genai.Client(
+    api_key=os.environ["GEMINI_API_KEY"],
+    http_options={"api_version": "v1"}
+)
 
 
 class CodeRequest(BaseModel):
@@ -68,7 +72,7 @@ Code:
 
     try:
         response = client.models.generate_content(
-            model="gemini-2.5-flash",
+            model="gemini-flash-latest",
             contents=prompt
         )
 
