@@ -61,7 +61,7 @@ try:
     )
 
     # Load Gemini model
-    model = GenerativeModel("gemini-1.5-flash")
+    model = GenerativeModel("gemini-live-2.5-flash-native-audio")
 
     logging.info("Vertex AI Gemini initialized successfully")
 
