@@ -17,10 +17,11 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-    
+
 
 # Configure Gemini client
-client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
+client = genai.Client(api_key=os.environ["GEMINI_API_KEY"])
+
 
 class CodeRequest(BaseModel):
     code: str
@@ -67,17 +68,22 @@ Code:
 
     try:
         response = client.models.generate_content(
-            model="gemini-2.5-pro",
+            model="gemini-2.5-flash",
             contents=prompt
         )
 
-        text = response.text.strip()
+        
 
-        if text.startswith("```"):
-            text = text.replace("```json", "").replace("```", "").strip()
+        print("RAW GEMINI RESPONSE:")
+        print(response)
 
-        return json.loads(text)
+        text = response.text
+        print("TEXT OUTPUT:")
+        print(text)
 
+        return {
+            "raw": text
+        }
     except Exception as e:
         return {
             "error": "Gemini API error",
